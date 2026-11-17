@@ -1,0 +1,29 @@
+---
+title: "Book Chapter Review: If your model is mis-specified, are you better off?"
+date: 2015-11-09
+categories: 
+  - "archives"
+coverImage: "textbetteroff.jpg"
+---
+
+This post is my interpretation of Chapter 10 of the book "[Advanced Data Analysis from an Elementary point of view](http://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/)". It is one of the most interesting reads I have found in quite some time (together with [this](http://www.math.ucsd.edu/~fan/research/outline.html)).
+
+Actually, the original title for the post was "Book Chapter review: Using non-parametric models to test parametric model mis-specifications". But shorter titles tends to attract more viewers.
+
+The first question that one might ask is "If we are going to use a non-parametric model to test a parametric model, why not going straight to non-parametric modelling instead?".  Well, there are advantages to having a parametric model if you can build one. It could be of interest for your application to express your process in terms of known mathematical models. Also, a well specified parametric model can converge faster to the true regression function than a non-parametric model. Finally, if you only have a small number of samples, you could have better predictions by using a parametric model (even if slightly mis-specified). The reason is simply because parametric models tend to have a significantly smaller bias than non-parametric models. Also, for the same number of samples, a well specified parametric model is likely to have less variance in its predictions than a non-parametric model. Now, if you have a cheap and fast way to obtain many more samples, a non-parametric model can make better predictions than a mis-specified parametric model.
+
+This is a consequence of the bias-variance trade-off that the author explains in a way that a person without a background in statistics can understand (in chapter 1.1.4 of the same book).
+
+Non-parametric models "have an open mind" when building a model, while parametric models "follow a hunch", if you will. One can find some similarities between modelling (parametric, non-parametric) and search algorithms, more specifically in uninformed search (BFS, DFS, Iterative deepening and variants) vs informed search (say, A\* and variants). Even with a relaxed (and admissible) version of the optimal heuristic, A\* is expected to traverse a shorter path than any uninformed search algorithm. However, it will traverse a larger path if the heuristic is poorly constructed, and most likely be outperformed by uninformed search. With this in mind, another question that may tickle you is: Can one translate a modelling problem into a search problem and have a machine automatically **and optimally** find the best parametric model for a given problem? **[Oh, yes](https://www.youtube.com/watch?v=3Xjir3YSUA8)** (you can leave that as background music for the day if you like). You will of course need to express the problem in a way that the program terminates before our sun dies, and an admissible heuristic also helps. But yeah, you can do that. Humans often solve harder problems than they give themselves credit for.
+
+If you were to build such a machine, the author can give you some suggestions to check for errors in your model. For instance, he suggests that if you have a good reason to think that the errors in a model can ONLY come from certain mis-specifications (say, that instead of being Y= θ1 X + ε it can only be Y=θ1 X + θ2 X + ε or maybe a couple other forms) then it may probably be faster and less sample-hungry for you to simply check whether the estimated θ2 is significantly different from 0, or whether the residuals from the second model are significantly smaller than those from the first. However, when no good reason is available to argue for one or other source of mis-specification, you can use non-parametric regression to check for all sources by doing either one of the following:
+
+- If the parametric model is right, it should predict as well as, or even better than the non-parametric one. So, you can check if the difference between Mean Squared errors of the two estimators is small enough.
+- If the parametric model is right, the non-parametric estimated regression curve should be very close to the parametric one. So, you can check that the distance between the two regression curves is approximately zero in all points.
+-  If the parametric model is right, then its residuals should be patternless and independent of input features. So, you can apply non-parametric smoothing to the parametric residuals and see if their expectation is approximately zero everywhere.
+
+For the last method, I can elaborate on the explanation from the author. If the residuals are Y-f(x;θ), then the expected value of the residuals given an input X is E\[Y-f(x;θ)|X\] (the author did not made it explicit, but I assume that the residuals must be calculated with x ⊆ X. I could be wrong on this, so please correct me if I am). Now, being our typical regression model something in the lines of Y=f(X;θ)+ε, we substitute this in the expectation, and we end up with E\[f(x;θ)+ε-f(x;θ) | X\]. In this expression, we have that f(x;θ)+ε-f(x;θ) = ε, so you end up with E\[ε|X\]. Since the constant is independent from X, then the expression becomes E\[ε|X\] = E\[ε\]. Since the expected value of a constant ε will always be the constant, then E\[ε\]=ε. And with a significantly small enough ε, we can say that ε ≅ 0, so no matter what input X we have, the expected value of the residuals of the predictor should be approximately equal to zero.
+
+So yes, under some circumstances (too little samples) you can actually be better off with a slightly mis-specified (i.e. relaxed) model, than with a full non-parametric model. And yes, you can indeed check if the assumptions for your model are actually valid.
+
+Have fun, and see you in the next post!
